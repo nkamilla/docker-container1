@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: movielens
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - movielens_net
+
+  analytics:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./notebooks:/home/nkamill
+      - ./data:/data  # Mapowanie katalogu 'data' z danymi MovieLens
+    ports:
+      - "8888:8888"
+    depends_on:
+      - db
+    networks:
+      - movielens_net
+
+networks:
+  movielens_net:
+    driver: bridge
+
+volumes:
+  db_data:
